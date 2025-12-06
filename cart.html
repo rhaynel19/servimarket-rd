@@ -11,11 +11,14 @@
 <body>
     <header>
         <nav>
-            <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
+            <h1><a href="index.html">🇩🇴 ServiMarket RD</a></h1>
             <ul>
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="services.html">Servicios</a></li>
+                <li><a href="jobs.html">Empleos</a></li>
                 <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+                <li><a href="login.html">Iniciar Sesión</a></li>
+                <li><a href="register.html">Registrarse</a></li>
             </ul>
         </nav>
     </header>
@@ -24,94 +27,72 @@
         <div class="container">
             <h2 style="margin-bottom: 2rem;">Tu Carrito</h2>
             <div id="cart-items"></div>
-            <!DOCTYPE html>
-            <html lang="es">
+            <div style="text-align: right; margin-top: 2rem;">
+                <h3 id="cart-total" style="font-size: 2rem; margin-bottom: 1rem;">Total: RD$ 0.00</h3>
+                <a href="checkout.html" class="btn" id="checkout-btn">Proceder al Pago</a>
+            </div>
+        </div>
 
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Carrito - Marketplace RD</title>
-                <link rel="stylesheet" href="assets/css/style.css">
-            </head>
+    </main>
+    <footer style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
+        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
+    </footer>
 
-            <body>
-                <header>
-                    <nav>
-                        <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
-                        <ul>
-                            <li><a href="index.html">Inicio</a></li>
-                            <li><a href="services.html">Servicios</a></li>
-                            <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
-                        </ul>
-                    </nav>
-                </header>
-                <main>
+    <script>
+        // --- LÓGICA STANDALONE PARA CARRITO ---
+        const LocalCart = {
+            get: () => {
+                try {
+                    return JSON.parse(localStorage.getItem('cart')) || [];
+                } catch (e) {
+                    return [];
+                }
+            },
+            remove: (id) => {
+                let items = LocalCart.get();
+                items = items.filter(i => i.id !== id);
+                localStorage.setItem('cart', JSON.stringify(items));
+                LocalCart.updateCounter();
+                renderCart();
+            },
+            total: () => {
+                const items = LocalCart.get();
+                return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            },
+            updateCounter: () => {
+                const items = LocalCart.get();
+                const count = items.reduce((sum, item) => sum + item.quantity, 0);
+                const badge = document.getElementById('cart-count');
+                if (badge) {
+                    badge.textContent = count > 0 ? `(${count})` : '';
+                }
+            }
+        };
 
-                    <div class="container">
-                        <h2 style="margin-bottom: 2rem;">Tu Carrito</h2>
-                        <div id="cart-items"></div>
-                        <div style="text-align: right; margin-top: 2rem;">
-                            <h3 id="cart-total" style="font-size: 2rem; margin-bottom: 1rem;">Total: RD$ 0.00</h3>
-                            <a href="checkout.html" class="btn" id="checkout-btn">Proceder al Pago</a>
-                        </div>
-                    </div>
+        const UI = {
+            formatCurrency: (amount) => {
+                return new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }).format(amount);
+            }
+        };
 
-                </main>
-                <script>
-                    // --- LÓGICA STANDALONE PARA CARRITO ---
-                    const LocalCart = {
-                        get: () => {
-                            try {
-                                return JSON.parse(localStorage.getItem('cart')) || [];
-                            } catch (e) {
-                                return [];
-                            }
-                        },
-                        remove: (id) => {
-                            let items = LocalCart.get();
-                            items = items.filter(i => i.id !== id);
-                            localStorage.setItem('cart', JSON.stringify(items));
-                            LocalCart.updateCounter();
-                            renderCart();
-                        },
-                        total: () => {
-                            const items = LocalCart.get();
-                            return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                        },
-                        updateCounter: () => {
-                            const items = LocalCart.get();
-                            const count = items.reduce((sum, item) => sum + item.quantity, 0);
-                            const badge = document.getElementById('cart-count');
-                            if (badge) {
-                                badge.textContent = count > 0 ? `(${count})` : '';
-                            }
-                        }
-                    };
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+            LocalCart.updateCounter();
+        });
 
-                    const UI = {
-                        formatCurrency: (amount) => {
-                            return new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }).format(amount);
-                        }
-                    };
+        function renderCart() {
+            const items = LocalCart.get();
+            const container = document.getElementById('cart-items');
 
-                    document.addEventListener('DOMContentLoaded', () => {
-                        renderCart();
-                        LocalCart.updateCounter();
-                    });
+            if (items.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 2rem;">Tu carrito está vacío.</p>';
+                const checkoutBtn = document.getElementById('checkout-btn');
+                if (checkoutBtn) checkoutBtn.style.display = 'none';
+                document.getElementById('cart-total').textContent = 'Total: RD$ 0.00';
+                return;
+            }
 
-                    function renderCart() {
-                        const items = LocalCart.get();
-                        const container = document.getElementById('cart-items');
-
-                        if (items.length === 0) {
-                            container.innerHTML = '<p style="text-align: center; padding: 2rem;">Tu carrito está vacío.</p>';
-                            const checkoutBtn = document.getElementById('checkout-btn');
-                            if (checkoutBtn) checkoutBtn.style.display = 'none';
-                            document.getElementById('cart-total').textContent = 'Total: RD$ 0.00';
-                            return;
-                        }
-
-                        container.innerHTML = `
+            container.innerHTML = `
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
@@ -138,16 +119,16 @@
                 </table>
             `;
 
-                        document.getElementById('cart-total').textContent = `Total: ${UI.formatCurrency(LocalCart.total())}`;
-                        const checkoutBtn = document.getElementById('checkout-btn');
-                        if (checkoutBtn) checkoutBtn.style.display = 'inline-block';
-                    }
+            document.getElementById('cart-total').textContent = `Total: ${UI.formatCurrency(LocalCart.total())}`;
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if (checkoutBtn) checkoutBtn.style.display = 'inline-block';
+        }
 
-                    // Función global para el botón onclick
-                    window.removeFromCart = function (id) {
-                        LocalCart.remove(id);
-                    };
-                </script>
-            </body>
+        // Función global para el botón onclick
+        window.removeFromCart = function (id) {
+            LocalCart.remove(id);
+        };
+    </script>
+</body>
 
-            </html>
+</html>
