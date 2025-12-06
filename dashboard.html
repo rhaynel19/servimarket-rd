@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Marketplace RD</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="services.html">Servicios</a></li>
+                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 id="welcome-msg">Bienvenido al Panel</h2>
+                <button onclick="auth.logout()" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="product-grid" style="margin-bottom: 3rem;">
+                <div class="product-card" style="padding: 2rem; text-align: center;">
+                    <h3 id="stat-1-label">Ventas Totales</h3>
+                    <p id="stat-1-val" style="font-size: 2.5rem; color: var(--secondary); font-weight: bold;">RD$ 0.00
+                    </p>
+                </div>
+                <div class="product-card" style="padding: 2rem; text-align: center;">
+                    <h3 id="stat-2-label">Pedidos/Solicitudes</h3>
+                    <p id="stat-2-val" style="font-size: 2.5rem; color: var(--accent); font-weight: bold;">0</p>
+                </div>
+            </div>
+
+            <!-- Dynamic Content Section -->
+            <div id="dashboard-content">
+                <!-- Content loaded via JS based on role -->
+            </div>
+        </div>
+
+    </main>    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = auth.getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('welcome-msg').textContent = `Panel de ${user.name} (${user.role.toUpperCase()})`;
+
+            const contentDiv = document.getElementById('dashboard-content');
+
+            if (user.role === 'vendedor') {
+                // Vendedor View
+                document.getElementById('stat-1-label').textContent = "Ingresos Totales";
+                document.getElementById('stat-2-label').textContent = "Productos Vendidos";
+
+                contentDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>Mis Productos</h3>
+                        <button class="btn" onclick="alert('Función de crear producto simulada')">+ Nuevo Producto</button>
+                    </div>
+                    <div class="product-grid" id="my-products"></div>
+                `;
+
+                const myProducts = db.get('products').filter(p => p.sellerId === user.id);
+                renderProducts(myProducts, 'my-products');
+
+            } else if (user.role === 'proveedor') {
+                // Proveedor View
+                document.getElementById('stat-1-label').textContent = "Ingresos por Servicios";
+                document.getElementById('stat-2-label').textContent = "Servicios Completados";
+
+                contentDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>Mis Servicios</h3>
+                        <button class="btn" onclick="alert('Función de crear servicio simulada')">+ Nuevo Servicio</button>
+                    </div>
+                    <div class="product-grid" id="my-services"></div>
+                `;
+
+                // Render Services (reuse product card style)
+                const myServices = db.get('services').filter(s => s.providerId === user.id);
+                const container = document.getElementById('my-services');
+                myServices.forEach(s => {
+                    container.innerHTML += `
+                        <div class="product-card" style="padding: 1.5rem;">
+                            <h3>${s.name}</h3>
+                            <p class="product-price">${ui.formatCurrency(s.price)}</p>
+                            <p>${s.category}</p>
+                            <p><small>${s.availability}</small></p>
+                            <button class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">Editar</button>
+                        </div>
+                    `;
+                });
+
+            } else {
+                // Cliente View
+                document.getElementById('stat-1-label').textContent = "Gasto Total";
+                document.getElementById('stat-2-label').textContent = "Mis Pedidos";
+
+                contentDiv.innerHTML = `<h3>Historial de Pedidos</h3><p>No tienes pedidos recientes.</p>`;
+            }
+        });
+    </script>
+</body>
+
+</html>

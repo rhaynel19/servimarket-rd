@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - ServiMarket RD</title>
+    <meta name="description" content="Panel administrativo de ServiMarket RD">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1A73E8, #0d47a1);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .admin-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 ServiMarket RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="admin.html">Admin Panel</a></li>
+                <li><a href="#" id="logout-btn">Salir</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>🛡️ Panel de Administración</h1>
+                <span class="badge badge-danger">CEO Access</span>
+            </div>
+
+            <!-- Estadísticas Globales -->
+            <div class="admin-grid">
+                <div class="stat-card">
+                    <h3 id="total-users">0</h3>
+                    <p>👥 Usuarios Totales</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #D4A017, #b8860b);">
+                    <h3 id="total-products">0</h3>
+                    <p>🛍️ Productos</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <h3 id="total-services">0</h3>
+                    <p>🔧 Servicios</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <h3 id="total-jobs">0</h3>
+                    <p>💼 Empleos</p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0;">
+                <button class="tab-btn active" onclick="showTab('users')">Usuarios</button>
+                <button class="tab-btn" onclick="showTab('products')">Productos</button>
+                <button class="tab-btn" onclick="showTab('services')">Servicios</button>
+                <button class="tab-btn" onclick="showTab('jobs')">Empleos</button>
+                <button class="tab-btn" onclick="showTab('orders')">Pedidos</button>
+            </div>
+
+            <!-- Tab: Usuarios -->
+            <div id="tab-users" class="admin-section tab-content">
+                <h2>Gestión de Usuarios</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Ubicación</th>
+                            <th>Rating</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Productos -->
+            <div id="tab-products" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Productos</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Categoría</th>
+                            <th>Vendedor</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Servicios -->
+            <div id="tab-services" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Servicios</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Categoría</th>
+                            <th>Proveedor</th>
+                            <th>Rating</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="services-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Empleos -->
+            <div id="tab-jobs" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Empleos</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Pago</th>
+                            <th>Empleador</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobs-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Pedidos -->
+            <div id="tab-orders" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Pedidos</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Total</th>
+                            <th>Método Pago</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <footer style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
+        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Verificar acceso admin
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = auth.getCurrentUser();
+            if (!user || user.role !== 'admin') {
+                ui.toast('Acceso denegado. Solo administradores.', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return;
+            }
+
+            await loadDashboard();
+        });
+
+        async function loadDashboard() {
+            try {
+                // Cargar estadísticas
+                const users = await db.get('users');
+                const products = await db.get('products');
+                const services = await db.get('services');
+                const jobs = await db.get('jobs');
+
+                document.getElementById('total-users').textContent = users.length;
+                document.getElementById('total-products').textContent = products.length;
+                document.getElementById('total-services').textContent = services.length;
+                document.getElementById('total-jobs').textContent = jobs.length;
+
+                // Cargar tablas
+                await loadUsers();
+                await loadProducts();
+                await loadServices();
+                await loadJobs();
+                await loadOrders();
+            } catch (error) {
+                console.error('Error cargando dashboard:', error);
+                ui.toast('Error al cargar datos', 'error');
+            }
+        }
+
+        async function loadUsers() {
+            const users = await db.get('users');
+            const tbody = document.getElementById('users-table-body');
+
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.id.toString().substring(0, 8)}...</td>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td><span class="badge badge-info">${u.role}</span></td>
+                    <td>${u.municipio || 'N/A'}</td>
+                    <td>⭐ ${u.rating || 5.0}</td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="viewUser('${u.id}')">Ver</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadProducts() {
+            const products = await db.get('products');
+            const tbody = document.getElementById('products-table-body');
+
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.id.toString().substring(0, 8)}...</td>
+                    <td>${p.name}</td>
+                    <td>${ui.formatCurrency(p.price)}</td>
+                    <td>${p.category}</td>
+                    <td>${p.seller_id ? p.seller_id.toString().substring(0, 8) : 'N/A'}</td>
+                    <td>${p.stock || 0}</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteProduct('${p.id}')">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadServices() {
+            const services = await db.get('services');
+            const tbody = document.getElementById('services-table-body');
+
+            tbody.innerHTML = services.map(s => `
+                <tr>
+                    <td>${s.id.toString().substring(0, 8)}...</td>
+                    <td>${s.name}</td>
+                    <td>${ui.formatCurrency(s.price)}</td>
+                    <td>${s.category}</td>
+                    <td>${s.provider_id ? s.provider_id.toString().substring(0, 8) : 'N/A'}</td>
+                    <td>⭐ ${s.rating || 5.0}</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteService('${s.id}')">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadJobs() {
+            const jobs = await db.get('jobs');
+            const tbody = document.getElementById('jobs-table-body');
+
+            tbody.innerHTML = jobs.map(j => `
+                <tr>
+                    <td>${j.id.toString().substring(0, 8)}...</td>
+                    <td>${j.title}</td>
+                    <td><span class="badge badge-warning">${j.type}</span></td>
+                    <td>${ui.formatCurrency(j.pay)}</td>
+                    <td>${j.employer_id ? j.employer_id.toString().substring(0, 8) : 'N/A'}</td>
+                    <td><span class="badge ${j.status === 'active' ? 'badge-success' : 'badge-danger'}">${j.status}</span></td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteJob('${j.id}')">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadOrders() {
+            const orders = await db.get('orders');
+            const tbody = document.getElementById('orders-table-body');
+
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay pedidos aún</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(o => `
+                <tr>
+                    <td>${o.id.toString().substring(0, 8)}...</td>
+                    <td>${o.user_id ? o.user_id.toString().substring(0, 8) : 'N/A'}</td>
+                    <td>${ui.formatCurrency(o.total)}</td>
+                    <td>${o.payment_method}</td>
+                    <td><span class="badge badge-info">${o.status}</span></td>
+                    <td>${new Date(o.created_at).toLocaleDateString('es-DO')}</td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="viewOrder('${o.id}')">Ver</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        // Actions
+        function viewUser(id) {
+            ui.toast('Función en desarrollo', 'warning');
+        }
+
+        async function deleteProduct(id) {
+            if (confirm('¿Estás seguro de eliminar este producto?')) {
+                await db.delete('products', id);
+                ui.toast('Producto eliminado');
+                await loadProducts();
+                await loadDashboard();
+            }
+        }
+
+        async function deleteService(id) {
+            if (confirm('¿Estás seguro de eliminar este servicio?')) {
+                await db.delete('services', id);
+                ui.toast('Servicio eliminado');
+                await loadServices();
+                await loadDashboard();
+            }
+        }
+
+        async function deleteJob(id) {
+            if (confirm('¿Estás seguro de eliminar este empleo?')) {
+                await db.delete('jobs', id);
+                ui.toast('Empleo eliminado');
+                await loadJobs();
+                await loadDashboard();
+            }
+        }
+
+        function viewOrder(id) {
+            ui.toast('Función en desarrollo', 'warning');
+        }
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.logout();
+        });
+    </script>
+    <style>
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #1A73E8;
+        }
+
+        .tab-btn.active {
+            color: #1A73E8;
+            border-bottom-color: #1A73E8;
+        }
+    </style>
+</body>
+
+</html>

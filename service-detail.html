@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Servicio - Marketplace RD</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="services.html">Servicios</a></li>
+                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <div class="container" id="service-detail-container">
+            <!-- Loaded via JS -->
+            <p>Cargando servicio...</p>
+        </div>
+
+    </main>    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = parseInt(urlParams.get('id'));
+            const service = db.get('services').find(s => s.id === id);
+
+            const container = document.getElementById('service-detail-container');
+
+            if (!service) {
+                container.innerHTML = '<p>Servicio no encontrado.</p>';
+                return;
+            }
+
+            const provider = db.get('users').find(u => u.id === service.providerId);
+
+            container.innerHTML = `
+                <div style="background: white; padding: 3rem; border-radius: 1rem; box-shadow: var(--shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
+                        <div>
+                            <span style="background: #d1fae5; color: #065f46; padding: 0.3rem 0.8rem; border-radius: 1rem; font-weight: bold;">${service.category}</span>
+                            <h1 style="font-size: 2.5rem; margin: 1rem 0; color: var(--primary);">${service.name}</h1>
+                            <p style="font-size: 1.2rem; color: #64748b; margin-bottom: 2rem;">${service.description}</p>
+                            
+                            <div style="margin-bottom: 2rem;">
+                                <h3>Detalles del Proveedor</h3>
+                                <p><strong>Nombre:</strong> ${provider ? provider.name : 'N/A'}</p>
+                                <p><strong>Ubicación:</strong> ${provider ? provider.location : 'N/A'}</p>
+                                <p><strong>Disponibilidad:</strong> ${service.availability}</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right; min-width: 250px;">
+                            <p style="font-size: 2.5rem; font-weight: bold; color: var(--secondary);">${ui.formatCurrency(service.price)}</p>
+                            <p style="color: #64748b; margin-bottom: 1rem;">Precio estimado</p>
+                            <button class="btn" onclick="requestService(${service.id})" style="width: 100%; font-size: 1.1rem; padding: 1rem;">Solicitar Servicio</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        function requestService(id) {
+            const user = auth.getCurrentUser();
+            if (!user) {
+                ui.toast('Inicia sesión para solicitar', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+            // Simulate request
+            const requests = db.get('serviceRequests');
+            requests.push({
+                id: Date.now(),
+                serviceId: id,
+                userId: user.id,
+                date: new Date().toISOString(),
+                status: 'Pendiente'
+            });
+            db.save('serviceRequests', requests);
+
+            ui.toast('¡Solicitud enviada al proveedor!');
+            setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        }
+    </script>
+</body>
+
+</html>

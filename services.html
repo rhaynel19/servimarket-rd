@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios - Marketplace RD</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="services.html">Servicios</a></li>
+                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <div class="container">
+            <div class="hero" style="background: linear-gradient(135deg, #059669, #064e3b);">
+                <h1>Encuentra Profesionales</h1>
+                <p>Plomeros, Electricistas, Belleza y más a tu disposición.</p>
+            </div>
+
+            <!-- Buscador -->
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="¿Qué servicio necesitas?">
+                <select id="cat-select">
+                    <option value="">Todas las categorías</option>
+                    <option value="Plomería">Plomería</option>
+                    <option value="Electricidad">Electricidad</option>
+                    <option value="Belleza">Belleza</option>
+                    <option value="Limpieza">Limpieza</option>
+                </select>
+                <button class="btn" onclick="filterServices()">Buscar</button>
+            </div>
+
+            <div id="services-grid" class="product-grid">
+                <!-- Services loaded via JS -->
+            </div>
+        </div>
+
+    </main>    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            filterServices();
+        });
+
+        function filterServices() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const cat = document.getElementById('cat-select').value;
+            const container = document.getElementById('services-grid');
+
+            const services = db.get('services');
+            const filtered = services.filter(s => {
+                const matchQuery = s.name.toLowerCase().includes(query) || s.description.toLowerCase().includes(query);
+                const matchCat = cat === '' || s.category === cat;
+                return matchQuery && matchCat;
+            });
+
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                container.innerHTML = '<p>No se encontraron servicios.</p>';
+                return;
+            }
+
+            filtered.forEach(s => {
+                const provider = db.get('users').find(u => u.id === s.providerId);
+                container.innerHTML += `
+                    <div class="product-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">${s.name}</h3>
+                                <span style="background: #d1fae5; color: #065f46; padding: 0.2rem 0.5rem; border-radius: 0.3rem; font-size: 0.8rem;">${s.category}</span>
+                            </div>
+                            <p style="color: #64748b; margin-bottom: 1rem;">${s.description}</p>
+                            <p><strong>Proveedor:</strong> ${provider ? provider.name : 'Desconocido'}</p>
+                            <p><strong>Ubicación:</strong> ${provider ? provider.location : 'N/A'}</p>
+                        </div>
+                        <div style="margin-top: 1.5rem;">
+                            <p class="product-price">${ui.formatCurrency(s.price)}</p>
+                            <button class="btn" style="width: 100%;" onclick="requestService(${s.id})">Solicitar Servicio</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function requestService(id) {
+            const user = auth.getCurrentUser();
+            if (!user) {
+                ui.toast('Debes iniciar sesión para solicitar servicios', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+            // Simulation of request
+            const service = db.get('services').find(s => s.id === id);
+            ui.toast(`Solicitud enviada para: ${service.name}`);
+        }
+    </script>
+</body>
+
+</html>

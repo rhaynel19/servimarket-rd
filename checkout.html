@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Marketplace RD</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="services.html">Servicios</a></li>
+                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <div class="container">
+            <h2 style="margin-bottom: 2rem;">Finalizar Compra</h2>
+
+            <div style="display: flex; gap: 3rem; flex-wrap: wrap;">
+                <!-- Order Summary -->
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="product-card" style="padding: 2rem;">
+                        <h3>Resumen del Pedido</h3>
+                        <div id="order-items" style="margin: 1rem 0;">
+                            <!-- Items loaded via JS -->
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 1rem 0;">
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold;">
+                            <span>Total:</span>
+                            <span id="order-total">RD$ 0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="form-container" style="margin: 0; max-width: 100%;">
+                        <h3>Método de Pago</h3>
+                        <form id="checkout-form">
+                            <div class="form-group">
+                                <label>Tipo de Pago</label>
+                                <select id="payment-method" onchange="toggleCardForm()">
+                                    <option value="cash">Efectivo al Recibir</option>
+                                    <option value="card">Tarjeta de Crédito/Débito</option>
+                                </select>
+                            </div>
+
+                            <div id="card-details" style="display: none;">
+                                <div class="form-group">
+                                    <label>Número de Tarjeta</label>
+                                    <input type="text" id="card-number" placeholder="0000 0000 0000 0000"
+                                        maxlength="19">
+                                </div>
+                                <div style="display: flex; gap: 1rem;">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>Expira</label>
+                                        <input type="text" placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label>CVV</label>
+                                        <input type="text" placeholder="123" maxlength="3">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Dirección de Entrega</label>
+                                <textarea required placeholder="Calle, Número, Sector..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn" style="width: 100%;">Confirmar Pedido</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = cart.get();
+            if (items.length === 0) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const container = document.getElementById('order-items');
+            let total = 0;
+
+            items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                container.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>${item.name} (x${item.quantity})</span>
+                        <span>${ui.formatCurrency(itemTotal)}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('order-total').textContent = ui.formatCurrency(total);
+        });
+
+        function toggleCardForm() {
+            const method = document.getElementById('payment-method').value;
+            document.getElementById('card-details').style.display = method === 'card' ? 'block' : 'none';
+        }
+
+        document.getElementById('checkout-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const method = document.getElementById('payment-method').value;
+
+            if (method === 'card') {
+                const cardNum = document.getElementById('card-number').value.replace(/\s/g, '');
+                if (cardNum.length < 13 || isNaN(cardNum)) {
+                    ui.toast('Número de tarjeta inválido', 'error');
+                    return;
+                }
+                // Simple Luhn Algorithm Simulation (accepts any number > 13 digits for demo)
+                ui.toast('Procesando pago con tarjeta...');
+            }
+
+            setTimeout(() => {
+                // Save Order
+                const user = auth.getCurrentUser();
+                const order = {
+                    id: Date.now(),
+                    userId: user ? user.id : 'guest',
+                    items: cart.get(),
+                    total: cart.total(),
+                    date: new Date().toISOString(),
+                    status: 'Pendiente',
+                    paymentMethod: method
+                };
+
+                db.add('orders', order);
+                cart.clear();
+
+                alert('¡Pedido Confirmado! Gracias por su compra.');
+                window.location.href = user ? 'dashboard.html' : 'index.html';
+            }, 1500);
+        });
+    </script>
+</body>
+
+</html>

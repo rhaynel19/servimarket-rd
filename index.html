@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiMarket RD - Marketplace Dominicano de Productos, Servicios y Empleos</title>
+    <meta name="description"
+        content="ServiMarket RD: Tu marketplace completo en República Dominicana. Compra productos locales, contrata servicios profesionales y encuentra empleos cerca de ti.">
+    <meta name="keywords" content="marketplace dominicano, productos RD, servicios RD, empleos RD, comprar local">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 ServiMarket RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="services.html">Servicios</a></li>
+                <li><a href="jobs.html">Empleos</a></li>
+                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+                <li><a href="login.html">Iniciar Sesión</a></li>
+                <li><a href="register.html">Registrarse</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <div class="container">
+            <div class="hero">
+                <h1>🇩🇴 Bienvenido a ServiMarket RD</h1>
+                <p>Tu marketplace completo: Productos, Servicios y Empleos en un solo lugar</p>
+            </div>
+
+            <!-- Quick Access Buttons -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+                <a href="#productos" class="product-card"
+                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🛍️</div>
+                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Productos</h3>
+                    <p style="color: #64748b; font-size: 0.9rem;">Compra artículos locales</p>
+                </a>
+                <a href="services.html" class="product-card"
+                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔧</div>
+                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Servicios</h3>
+                    <p style="color: #64748b; font-size: 0.9rem;">Encuentra profesionales</p>
+                </a>
+                <a href="jobs.html" class="product-card"
+                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💼</div>
+                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Empleos</h3>
+                    <p style="color: #64748b; font-size: 0.9rem;">Trabaja o contrata</p>
+                </a>
+                <a href="dashboard.html" class="product-card"
+                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Mi Negocio</h3>
+                    <p style="color: #64748b; font-size: 0.9rem;">Gestiona tu tienda</p>
+                </a>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Buscar productos..." onkeyup="filterProducts()">
+                <select id="cat-select" onchange="filterProducts()">
+                    <option value="">Todas las categorías</option>
+                    <option value="Postres">Postres</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Artesanía">Artesanía</option>
+                    <option value="Electrónicos">Electrónicos</option>
+                </select>
+                <select id="municipio-select" onchange="filterProducts()">
+                    <option value="">Todos los municipios</option>
+                    <option value="Santo Domingo">Santo Domingo</option>
+                    <option value="Santiago">Santiago</option>
+                    <option value="La Romana">La Romana</option>
+                    <option value="Puerto Plata">Puerto Plata</option>
+                </select>
+            </div>
+
+            <h2 id="productos" style="margin-bottom: 1.5rem; color: #0f172a;">Productos Destacados</h2>
+            <div id="product-grid" class="product-grid">
+                document.addEventListener('DOMContentLoaded', async () => {
+                await filterProducts();
+                });
+
+                async function filterProducts() {
+                try {
+                const search = document.getElementById('search-input').value.toLowerCase();
+                const category = document.getElementById('cat-select').value;
+                const municipio = document.getElementById('municipio-select').value;
+
+                const products = await db.get('products');
+                const filtered = products.filter(p => {
+                const matchSearch = p.name.toLowerCase().includes(search) ||
+                p.description.toLowerCase().includes(search);
+                const matchCategory = !category || p.category === category;
+                const matchMunicipio = !municipio || p.municipio === municipio;
+                return matchSearch && matchCategory && matchMunicipio;
+                });
+
+                renderProducts(filtered);
+                } catch (error) {
+                console.error('Error cargando productos:', error);
+                document.getElementById('product-grid').innerHTML = '<p
+                    style="grid-column: 1/-1; text-align: center; color: #ef4444;">Error al cargar productos. Por favor
+                    recarga la página.</p>';
+                }
+                }
+
+                function renderProducts(products) {
+                const container = document.getElementById('product-grid');
+
+                if (products.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron productos.
+                </p>';
+                return;
+                }
+
+                container.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x220/1A73E8/FFFFFF?text=${encodeURIComponent(p.name)}"
+                        alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x220?text=Sin+Imagen'">
+                    <div class="product-info">
+                        <h3>${p.name}</h3>
+                        <p class="product-price">${ui.formatCurrency(p.price)}</p>
+                        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 0.5rem;">${p.description}</p>
+                        <p style="font-size: 0.85rem; color: #64748b;">
+                            <strong>📍</strong> ${p.barrio}, ${p.municipio}<br>
+                            <strong>⭐</strong> ${p.rating} (${p.stock} disponibles)
+                        </p>
+                        <button class="btn" onclick="addToCart('${p.id}')" style="width: 100%; margin-top: 1rem;">Añadir
+                            al Carrito</button>
+                    </div>
+                </div>
+                `).join('');
+                }
+
+                async function addToCart(productId) {
+                try {
+                const product = await db.findOne('products', 'id', productId);
+                if (product) {
+                cart.add(product);
+                }
+                } catch (error) {
+                console.error('Error añadiendo al carrito:', error);
+                ui.toast('Error al añadir producto', 'error');
+                }
+                }
+                </script>
+</body>
+
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleos - ServiMarket RD</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 ServiMarket RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="services.html">Servicios</a></li>
+                <li><a href="jobs.html">Empleos</a></li>
+                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <div class="container">
+            <div class="hero" style="background: linear-gradient(135deg, #1A73E8, #0d47a1);">
+                <h1>🔧 Empleos y Chiripas</h1>
+                <p>Encuentra trabajos por hora o publica tu oferta</p>
+                <div style="margin-top: 2rem;">
+                    <button class="btn" onclick="showPostJobModal()" style="background: #D4A017;">+ Publicar
+                        Empleo</button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="search-bar">
+                <input type="text" id="job-search" placeholder="Buscar empleos..." onkeyup="filterJobs()">
+                <select id="job-type" onchange="filterJobs()">
+                    <option value="">Todos los tipos</option>
+                    <option value="Por Hora">Por Hora</option>
+                    <option value="Por Servicio">Por Servicio</option>
+                    <option value="Tiempo Completo">Tiempo Completo</option>
+                </select>
+                <select id="job-municipio" onchange="filterJobs()">
+                    <option value="">Todos los municipios</option>
+                    <option value="Santo Domingo">Santo Domingo</option>
+                    <option value="Santiago">Santiago</option>
+                    <option value="La Romana">La Romana</option>
+                    <option value="Puerto Plata">Puerto Plata</option>
+                    <option value="San Cristóbal">San Cristóbal</option>
+                </select>
+            </div>
+
+            <h2 style="margin-bottom: 1.5rem; color: var(--primary);">Empleos Disponibles</h2>
+            <div id="jobs-grid" class="product-grid">
+                <!-- Jobs loaded via JS -->
+            </div>
+        </div>
+
+        <!-- Post Job Modal -->
+        <div id="post-job-modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="form-container" style="max-width: 500px; margin: 0;">
+                <h2>Publicar Empleo</h2>
+                <form id="post-job-form">
+                    <div class="form-group">
+                        <label>Título del Empleo</label>
+                        <input type="text" name="title" required placeholder="Ej: Ayudante de construcción">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Trabajo</label>
+                        <select name="type" required>
+                            <option value="Por Hora">Por Hora</option>
+                            <option value="Por Servicio">Por Servicio</option>
+                            <option value="Tiempo Completo">Tiempo Completo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pago</label>
+                        <input type="number" name="pay" required placeholder="Cantidad en RD$">
+                    </div>
+                    <div class="form-group">
+                        <label>Pago por</label>
+                        <select name="payPer" required>
+                            <option value="hora">Hora</option>
+                            <option value="servicio">Servicio</option>
+                            <option value="día">Día</option>
+                            <option value="semana">Semana</option>
+                            <option value="mes">Mes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea name="description" required rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Municipio</label>
+                        <select name="municipio" required id="post-municipio" onchange="updateBarriosPost()">
+                            <option value="">Selecciona...</option>
+                            <option value="Santo Domingo">Santo Domingo</option>
+                            <option value="Santiago">Santiago</option>
+                            <option value="La Romana">La Romana</option>
+                            <option value="Puerto Plata">Puerto Plata</option>
+                            <option value="San Cristóbal">San Cristóbal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Barrio</label>
+                        <select name="barrio" required id="post-barrio">
+                            <option value="">Primero selecciona municipio</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn" style="flex: 1;">Publicar</button>
+                        <button type="button" class="btn btn-secondary" onclick="closePostJobModal()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    <footer style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
+        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
+    </footer>    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            filterJobs();
+        });
+
+        function filterJobs() {
+            const search = document.getElementById('job-search').value.toLowerCase();
+            const type = document.getElementById('job-type').value;
+            const municipio = document.getElementById('job-municipio').value;
+
+            const allJobs = db.get('jobs');
+            const filtered = allJobs.filter(j => {
+                const matchSearch = j.title.toLowerCase().includes(search) || j.description.toLowerCase().includes(search);
+                const matchType = !type || j.type === type;
+                const matchMunicipio = !municipio || j.municipio === municipio;
+                return matchSearch && matchType && matchMunicipio && j.status === 'active';
+            });
+
+            renderJobs(filtered);
+        }
+
+        function renderJobs(jobs) {
+            const container = document.getElementById('jobs-grid');
+
+            if (jobs.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron empleos.</p>';
+                return;
+            }
+
+            container.innerHTML = jobs.map(job => {
+                const employer = db.findOne('users', u => u.id === job.employerId);
+                const applications = jobs.getApplications(job.id);
+
+                return `
+                    <div class="product-card" style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h3 style="color: #1A73E8; margin: 0;">${job.title}</h3>
+                            <span style="background: #D4A017; color: white; padding: 0.3rem 0.8rem; border-radius: 1rem; font-size: 0.85rem; font-weight: bold;">${job.type}</span>
+                        </div>
+                        <p style="color: #64748b; margin-bottom: 1rem;">${job.description}</p>
+                        <div style="margin-bottom: 1rem;">
+                            <p><strong>💰 Pago:</strong> ${ui.formatCurrency(job.pay)} / ${job.payPer}</p>
+                            <p><strong>📍 Ubicación:</strong> ${job.barrio}, ${job.municipio}</p>
+                            <p><strong>👤 Empleador:</strong> ${employer ? employer.name : 'N/A'}</p>
+                            <p style="font-size: 0.85rem; color: #64748b;">Publicado: ${new Date(job.postedDate).toLocaleDateString('es-DO')}</p>
+                        </div>
+                        <button class="btn" onclick="applyToJob(${job.id})" style="width: 100%; background: #1A73E8;">
+                            Aplicar Ahora
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyToJob(jobId) {
+            const user = auth.getCurrentUser();
+            if (!user) {
+                ui.toast('Debes iniciar sesión para aplicar', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+
+            try {
+                jobs.apply(jobId);
+                ui.toast('¡Aplicación enviada exitosamente!');
+                filterJobs();
+            } catch (error) {
+                ui.toast(error.message, 'error');
+            }
+        }
+
+        function showPostJobModal() {
+            const user = auth.getCurrentUser();
+            if (!user) {
+                ui.toast('Debes iniciar sesión para publicar', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+            document.getElementById('post-job-modal').style.display = 'flex';
+        }
+
+        function closePostJobModal() {
+            document.getElementById('post-job-modal').style.display = 'none';
+            document.getElementById('post-job-form').reset();
+        }
+
+        function updateBarriosPost() {
+            const municipio = document.getElementById('post-municipio').value;
+            const barrioSelect = document.getElementById('post-barrio');
+
+            if (!municipio || !GEO.municipios[municipio]) {
+                barrioSelect.innerHTML = '<option value="">Primero selecciona municipio</option>';
+                return;
+            }
+
+            const barrios = GEO.municipios[municipio];
+            barrioSelect.innerHTML = barrios.map(b => `<option value="${b}">${b}</option>`).join('');
+        }
+
+        document.getElementById('post-job-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const jobData = Object.fromEntries(formData.entries());
+            jobData.pay = parseFloat(jobData.pay);
+
+            try {
+                jobs.post(jobData);
+                ui.toast('¡Empleo publicado exitosamente!');
+                closePostJobModal();
+                filterJobs();
+            } catch (error) {
+                ui.toast(error.message, 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

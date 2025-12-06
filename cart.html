@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Marketplace RD</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="services.html">Servicios</a></li>
+                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+
+        <div class="container">
+            <h2 style="margin-bottom: 2rem;">Tu Carrito</h2>
+            <div id="cart-items"></div>
+            <div style="text-align: right; margin-top: 2rem;">
+                <h3 id="cart-total" style="font-size: 2rem; margin-bottom: 1rem;">Total: RD$ 0.00</h3>
+                <a href="checkout.html" class="btn" id="checkout-btn">Proceder al Pago</a>
+            </div>
+        </div>
+
+    </main>    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+        });
+
+        function renderCart() {
+            const items = cart.get();
+            const container = document.getElementById('cart-items');
+
+            if (items.length === 0) {
+                container.innerHTML = '<p>Tu carrito está vacío.</p>';
+                document.getElementById('checkout-btn').style.display = 'none';
+                return;
+            }
+
+            container.innerHTML = `
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${ui.formatCurrency(item.price)}</td>
+                                <td>${item.quantity}</td>
+                                <td>${ui.formatCurrency(item.price * item.quantity)}</td>
+                                <td><button class="btn btn-danger" onclick="removeFromCart(${item.id})">Eliminar</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('cart-total').textContent = `Total: ${ui.formatCurrency(cart.total())}`;
+        }
+
+        function removeFromCart(id) {
+            let items = cart.get();
+            items = items.filter(i => i.id !== id);
+            localStorage.setItem('cart', JSON.stringify(items));
+            ui.updateCartCount();
+            renderCart();
+        }
+    </script>
+</body>
+
+</html>

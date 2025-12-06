@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEMO Panel CEO - ServiMarket RD</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1A73E8, #0d47a1);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .admin-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #1A73E8;
+        }
+
+        .tab-btn.active {
+            color: #1A73E8;
+            border-bottom-color: #1A73E8;
+        }
+
+        .demo-banner {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1><a href="index.html">🇩🇴 ServiMarket RD</a></h1>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="admin-demo.html">DEMO Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <div class="demo-banner">
+                🎭 MODO DEMO - Datos Simulados (No requiere Supabase)
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>🛡️ Panel de Administración CEO</h1>
+                <span class="badge badge-danger">CEO Access - DEMO</span>
+            </div>
+
+            <!-- Estadísticas Globales -->
+            <div class="admin-grid">
+                <div class="stat-card">
+                    <h3 id="total-users">12</h3>
+                    <p>👥 Usuarios Totales</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #D4A017, #b8860b);">
+                    <h3 id="total-products">28</h3>
+                    <p>🛍️ Productos</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <h3 id="total-services">15</h3>
+                    <p>🔧 Servicios</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <h3 id="total-jobs">8</h3>
+                    <p>💼 Empleos</p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e2e8f0;">
+                <button class="tab-btn active" onclick="showTab('users')">Usuarios</button>
+                <button class="tab-btn" onclick="showTab('products')">Productos</button>
+                <button class="tab-btn" onclick="showTab('services')">Servicios</button>
+                <button class="tab-btn" onclick="showTab('jobs')">Empleos</button>
+                <button class="tab-btn" onclick="showTab('orders')">Pedidos</button>
+            </div>
+
+            <!-- Tab: Usuarios -->
+            <div id="tab-users" class="admin-section tab-content">
+                <h2>Gestión de Usuarios</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Ubicación</th>
+                            <th>Rating</th>
+                            <th>Fecha Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Carlos Pérez</td>
+                            <td>carlos@test.com</td>
+                            <td><span class="badge badge-info">vendedor</span></td>
+                            <td>Santo Domingo, Piantini</td>
+                            <td>⭐ 4.8</td>
+                            <td>2025-01-15</td>
+                        </tr>
+                        <tr>
+                            <td>María González</td>
+                            <td>maria@test.com</td>
+                            <td><span class="badge badge-success">proveedor</span></td>
+                            <td>Santiago, Centro</td>
+                            <td>⭐ 4.9</td>
+                            <td>2025-01-20</td>
+                        </tr>
+                        <tr>
+                            <td>Juan Rodríguez</td>
+                            <td>juan@test.com</td>
+                            <td><span class="badge badge-warning">cliente</span></td>
+                            <td>La Romana, Centro</td>
+                            <td>⭐ 5.0</td>
+                            <td>2025-02-01</td>
+                        </tr>
+                        <tr>
+                            <td>Ana Martínez</td>
+                            <td>ana@test.com</td>
+                            <td><span class="badge badge-info">vendedor</span></td>
+                            <td>Puerto Plata, Playa Dorada</td>
+                            <td>⭐ 4.7</td>
+                            <td>2025-02-10</td>
+                        </tr>
+                        <tr>
+                            <td>CEO Admin</td>
+                            <td>ceo@servimarketrd.com</td>
+                            <td><span class="badge badge-danger">admin</span></td>
+                            <td>Santo Domingo, Piantini</td>
+                            <td>⭐ 5.0</td>
+                            <td>2025-01-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Productos -->
+            <div id="tab-products" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Productos</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Categoría</th>
+                            <th>Vendedor</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Dulce de Leche Artesanal</td>
+                            <td>RD$ 150.00</td>
+                            <td>Postres</td>
+                            <td>Carlos Pérez</td>
+                            <td>50</td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('producto')">Eliminar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Guayabera Premium</td>
+                            <td>RD$ 2,500.00</td>
+                            <td>Ropa</td>
+                            <td>Ana Martínez</td>
+                            <td>15</td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('producto')">Eliminar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Muñeca Limé</td>
+                            <td>RD$ 800.00</td>
+                            <td>Artesanía</td>
+                            <td>Carlos Pérez</td>
+                            <td>30</td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('producto')">Eliminar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Café Orgánico RD</td>
+                            <td>RD$ 450.00</td>
+                            <td>Alimentos</td>
+                            <td>Ana Martínez</td>
+                            <td>100</td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('producto')">Eliminar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Servicios -->
+            <div id="tab-services" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Servicios</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Categoría</th>
+                            <th>Proveedor</th>
+                            <th>Rating</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reparación de Fugas</td>
+                            <td>RD$ 1,500.00</td>
+                            <td>Plomería</td>
+                            <td>María González</td>
+                            <td>⭐ 4.9</td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('servicio')">Eliminar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Instalación de Baños</td>
+                            <td>RD$ 3,000.00</td>
+                            <td>Plomería</td>
+                            <td>María González</td>
+                            <td>⭐ 4.8</td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('servicio')">Eliminar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Corte de Cabello</td>
+                            <td>RD$ 300.00</td>
+                            <td>Barbería</td>
+                            <td>María González</td>
+                            <td>⭐ 4.7</td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('servicio')">Eliminar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Empleos -->
+            <div id="tab-jobs" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Empleos</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Pago</th>
+                            <th>Empleador</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ayudante de Construcción</td>
+                            <td><span class="badge badge-warning">Por Hora</span></td>
+                            <td>RD$ 250/hora</td>
+                            <td>Carlos Pérez</td>
+                            <td><span class="badge badge-success">active</span></td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('empleo')">Eliminar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Delivery de Comida</td>
+                            <td><span class="badge badge-info">Por Servicio</span></td>
+                            <td>RD$ 150/entrega</td>
+                            <td>Ana Martínez</td>
+                            <td><span class="badge badge-success">active</span></td>
+                            <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    onclick="deleteItem('empleo')">Eliminar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab: Pedidos -->
+            <div id="tab-orders" class="admin-section tab-content" style="display: none;">
+                <h2>Gestión de Pedidos</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Total</th>
+                            <th>Método Pago</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ORD-001</td>
+                            <td>Juan Rodríguez</td>
+                            <td>RD$ 1,450.00</td>
+                            <td>Tarjeta</td>
+                            <td><span class="badge badge-success">Completado</span></td>
+                            <td>2025-12-05</td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-002</td>
+                            <td>María González</td>
+                            <td>RD$ 800.00</td>
+                            <td>Efectivo</td>
+                            <td><span class="badge badge-warning">Procesando</span></td>
+                            <td>2025-12-06</td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-003</td>
+                            <td>Carlos Pérez</td>
+                            <td>RD$ 2,500.00</td>
+                            <td>Contra Entrega</td>
+                            <td><span class="badge badge-info">Pendiente</span></td>
+                            <td>2025-12-06</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <footer style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
+        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; color: #f59e0b;">🎭 MODO DEMO - Para acceso real, configura Supabase</p>
+    </footer>
+
+    <script>
+        // Tab navigation
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        // Delete action
+        function deleteItem(type) {
+            if (confirm(`¿Estás seguro de eliminar este ${type}?`)) {
+                event.target.closest('tr').remove();
+                showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} eliminado exitosamente`, 'success');
+
+                // Update stats
+                if (type === 'producto') {
+                    const current = parseInt(document.getElementById('total-products').textContent);
+                    document.getElementById('total-products').textContent = current - 1;
+                } else if (type === 'servicio') {
+                    const current = parseInt(document.getElementById('total-services').textContent);
+                    document.getElementById('total-services').textContent = current - 1;
+                } else if (type === 'empleo') {
+                    const current = parseInt(document.getElementById('total-jobs').textContent);
+                    document.getElementById('total-jobs').textContent = current - 1;
+                }
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : '#1A73E8'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Welcome message
+        setTimeout(() => {
+            showToast('¡Bienvenido al Panel CEO! 🛡️', 'success');
+        }, 500);
+    </script>
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+
+</html>
