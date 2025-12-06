@@ -86,6 +86,26 @@
             background: #dbeafe;
             color: #1e40af;
         }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #1A73E8;
+        }
+
+        .tab-btn.active {
+            color: #1A73E8;
+            border-bottom-color: #1A73E8;
+        }
     </style>
 </head>
 
@@ -96,7 +116,7 @@
             <ul>
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="admin.html">Admin Panel</a></li>
-                <li><a href="#" id="logout-btn">Salir</a></li>
+                <li><a href="#" onclick="logout()">Salir</a></li>
             </ul>
         </nav>
     </header>
@@ -110,19 +130,19 @@
             <!-- Estadísticas Globales -->
             <div class="admin-grid">
                 <div class="stat-card">
-                    <h3 id="total-users">0</h3>
+                    <h3 id="total-users">12</h3>
                     <p>👥 Usuarios Totales</p>
                 </div>
                 <div class="stat-card" style="background: linear-gradient(135deg, #D4A017, #b8860b);">
-                    <h3 id="total-products">0</h3>
+                    <h3 id="total-products">3</h3>
                     <p>🛍️ Productos</p>
                 </div>
                 <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
-                    <h3 id="total-services">0</h3>
+                    <h3 id="total-services">5</h3>
                     <p>🔧 Servicios</p>
                 </div>
                 <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                    <h3 id="total-jobs">0</h3>
+                    <h3 id="total-jobs">4</h3>
                     <p>💼 Empleos</p>
                 </div>
             </div>
@@ -236,60 +256,70 @@
         <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/supabase-config.js"></script>
-    <script src="assets/js/app.js"></script>
     <script>
-        // Verificar acceso admin
-        document.addEventListener('DOMContentLoaded', async () => {
-            const user = auth.getCurrentUser();
-            if (!user || user.role !== 'admin') {
-                ui.toast('Acceso denegado. Solo administradores.', 'error');
-                setTimeout(() => window.location.href = 'index.html', 2000);
-                return;
-            }
+        // --- DATOS DE EJEMPLO PARA ADMIN PANEL ---
 
-            await loadDashboard();
+        const ADMIN_DATA = {
+            users: [
+                { id: 'usr001', name: 'Juan Pérez', email: 'juan@example.com', role: 'seller', municipio: 'Santo Domingo', rating: 4.8 },
+                { id: 'usr002', name: 'María García', email: 'maria@example.com', role: 'buyer', municipio: 'Santiago', rating: 5.0 },
+                { id: 'usr003', name: 'Carlos López', email: 'carlos@example.com', role: 'seller', municipio: 'La Romana', rating: 4.5 },
+                { id: 'usr004', name: 'Ana Martínez', email: 'ana@example.com', role: 'admin', municipio: 'Santo Domingo', rating: 5.0 }
+            ],
+            products: [
+                { id: 'prd001', name: 'Dulce de Leche Artesanal', price: 150, category: 'Postres', seller: 'Juan Pérez', stock: 50 },
+                { id: 'prd002', name: 'Guayabera Premium', price: 2500, category: 'Ropa', seller: 'María García', stock: 15 },
+                { id: 'prd003', name: 'Muñeca Limé', price: 800, category: 'Artesanía', seller: 'Carlos López', stock: 30 }
+            ],
+            services: [
+                { id: 'srv001', name: 'Plomería Residencial', price: 1500, category: 'Plomería', provider: 'Juan Pérez', rating: 4.8 },
+                { id: 'srv002', name: 'Instalación Inversores', price: 2500, category: 'Electricidad', provider: 'ElectroServicios', rating: 4.9 },
+                { id: 'srv003', name: 'Maquillaje Profesional', price: 2000, category: 'Belleza', provider: 'Laura Beauty', rating: 5.0 },
+                { id: 'srv004', name: 'Limpieza Profunda', price: 1200, category: 'Limpieza', provider: 'CleanHome RD', rating: 4.6 },
+                { id: 'srv005', name: 'Reparación Aires', price: 1800, category: 'Técnico', provider: 'FrioMax', rating: 4.7 }
+            ],
+            jobs: [
+                { id: 'job001', title: 'Ayudante Construcción', type: 'Por Día', pay: 1200, employer: 'Constructora ABC', status: 'active' },
+                { id: 'job002', title: 'Vendedor Tienda', type: 'Tiempo Completo', pay: 18000, employer: 'Tienda La Moda', status: 'active' },
+                { id: 'job003', title: 'Jardinero Ocasional', type: 'Por Servicio', pay: 2500, employer: 'Residencia Privada', status: 'active' },
+                { id: 'job004', title: 'Repartidor Motor', type: 'Tiempo Completo', pay: 15000, employer: 'Pizzería Italia', status: 'closed' }
+            ],
+            orders: [
+                { id: 'ord001', user: 'María García', total: 3450, payment_method: 'Efectivo', status: 'Completado', date: '2025-12-05' },
+                { id: 'ord002', user: 'Juan Pérez', total: 800, payment_method: 'Transferencia', status: 'Pendiente', date: '2025-12-06' }
+            ]
+        };
+
+        // Utilidades
+        const UI = {
+            formatCurrency: (amount) => {
+                return new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }).format(amount);
+            }
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllTables();
         });
 
-        async function loadDashboard() {
-            try {
-                // Cargar estadísticas
-                const users = await db.get('users');
-                const products = await db.get('products');
-                const services = await db.get('services');
-                const jobs = await db.get('jobs');
-
-                document.getElementById('total-users').textContent = users.length;
-                document.getElementById('total-products').textContent = products.length;
-                document.getElementById('total-services').textContent = services.length;
-                document.getElementById('total-jobs').textContent = jobs.length;
-
-                // Cargar tablas
-                await loadUsers();
-                await loadProducts();
-                await loadServices();
-                await loadJobs();
-                await loadOrders();
-            } catch (error) {
-                console.error('Error cargando dashboard:', error);
-                ui.toast('Error al cargar datos', 'error');
-            }
+        function loadAllTables() {
+            loadUsers();
+            loadProducts();
+            loadServices();
+            loadJobs();
+            loadOrders();
         }
 
-        async function loadUsers() {
-            const users = await db.get('users');
+        function loadUsers() {
             const tbody = document.getElementById('users-table-body');
-
-            tbody.innerHTML = users.map(u => `
+            tbody.innerHTML = ADMIN_DATA.users.map(u => `
                 <tr>
-                    <td>${u.id.toString().substring(0, 8)}...</td>
+                    <td>${u.id}</td>
                     <td>${u.name}</td>
                     <td>${u.email}</td>
                     <td><span class="badge badge-info">${u.role}</span></td>
-                    <td>${u.municipio || 'N/A'}</td>
-                    <td>⭐ ${u.rating || 5.0}</td>
+                    <td>${u.municipio}</td>
+                    <td>⭐ ${u.rating}</td>
                     <td>
                         <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="viewUser('${u.id}')">Ver</button>
                     </td>
@@ -297,80 +327,67 @@
             `).join('');
         }
 
-        async function loadProducts() {
-            const products = await db.get('products');
+        function loadProducts() {
             const tbody = document.getElementById('products-table-body');
-
-            tbody.innerHTML = products.map(p => `
+            tbody.innerHTML = ADMIN_DATA.products.map(p => `
                 <tr>
-                    <td>${p.id.toString().substring(0, 8)}...</td>
+                    <td>${p.id}</td>
                     <td>${p.name}</td>
-                    <td>${ui.formatCurrency(p.price)}</td>
+                    <td>${UI.formatCurrency(p.price)}</td>
                     <td>${p.category}</td>
-                    <td>${p.seller_id ? p.seller_id.toString().substring(0, 8) : 'N/A'}</td>
-                    <td>${p.stock || 0}</td>
+                    <td>${p.seller}</td>
+                    <td>${p.stock}</td>
                     <td>
-                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteProduct('${p.id}')">Eliminar</button>
+                        <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: #ef4444;" onclick="deleteProduct('${p.id}')">Eliminar</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        async function loadServices() {
-            const services = await db.get('services');
+        function loadServices() {
             const tbody = document.getElementById('services-table-body');
-
-            tbody.innerHTML = services.map(s => `
+            tbody.innerHTML = ADMIN_DATA.services.map(s => `
                 <tr>
-                    <td>${s.id.toString().substring(0, 8)}...</td>
+                    <td>${s.id}</td>
                     <td>${s.name}</td>
-                    <td>${ui.formatCurrency(s.price)}</td>
+                    <td>${UI.formatCurrency(s.price)}</td>
                     <td>${s.category}</td>
-                    <td>${s.provider_id ? s.provider_id.toString().substring(0, 8) : 'N/A'}</td>
-                    <td>⭐ ${s.rating || 5.0}</td>
+                    <td>${s.provider}</td>
+                    <td>⭐ ${s.rating}</td>
                     <td>
-                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteService('${s.id}')">Eliminar</button>
+                        <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: #ef4444;" onclick="deleteService('${s.id}')">Eliminar</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        async function loadJobs() {
-            const jobs = await db.get('jobs');
+        function loadJobs() {
             const tbody = document.getElementById('jobs-table-body');
-
-            tbody.innerHTML = jobs.map(j => `
+            tbody.innerHTML = ADMIN_DATA.jobs.map(j => `
                 <tr>
-                    <td>${j.id.toString().substring(0, 8)}...</td>
+                    <td>${j.id}</td>
                     <td>${j.title}</td>
                     <td><span class="badge badge-warning">${j.type}</span></td>
-                    <td>${ui.formatCurrency(j.pay)}</td>
-                    <td>${j.employer_id ? j.employer_id.toString().substring(0, 8) : 'N/A'}</td>
+                    <td>${UI.formatCurrency(j.pay)}</td>
+                    <td>${j.employer}</td>
                     <td><span class="badge ${j.status === 'active' ? 'badge-success' : 'badge-danger'}">${j.status}</span></td>
                     <td>
-                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="deleteJob('${j.id}')">Eliminar</button>
+                        <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: #ef4444;" onclick="deleteJob('${j.id}')">Eliminar</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        async function loadOrders() {
-            const orders = await db.get('orders');
+        function loadOrders() {
             const tbody = document.getElementById('orders-table-body');
-
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay pedidos aún</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = orders.map(o => `
+            tbody.innerHTML = ADMIN_DATA.orders.map(o => `
                 <tr>
-                    <td>${o.id.toString().substring(0, 8)}...</td>
-                    <td>${o.user_id ? o.user_id.toString().substring(0, 8) : 'N/A'}</td>
-                    <td>${ui.formatCurrency(o.total)}</td>
+                    <td>${o.id}</td>
+                    <td>${o.user}</td>
+                    <td>${UI.formatCurrency(o.total)}</td>
                     <td>${o.payment_method}</td>
                     <td><span class="badge badge-info">${o.status}</span></td>
-                    <td>${new Date(o.created_at).toLocaleDateString('es-DO')}</td>
+                    <td>${o.date}</td>
                     <td>
                         <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="viewOrder('${o.id}')">Ver</button>
                     </td>
@@ -389,67 +406,55 @@
 
         // Actions
         function viewUser(id) {
-            ui.toast('Función en desarrollo', 'warning');
+            alert(`Ver detalles del usuario: ${id}\n\nEsta función mostraría el perfil completo del usuario.`);
         }
 
-        async function deleteProduct(id) {
+        function deleteProduct(id) {
             if (confirm('¿Estás seguro de eliminar este producto?')) {
-                await db.delete('products', id);
-                ui.toast('Producto eliminado');
-                await loadProducts();
-                await loadDashboard();
+                const index = ADMIN_DATA.products.findIndex(p => p.id === id);
+                if (index > -1) {
+                    ADMIN_DATA.products.splice(index, 1);
+                    loadProducts();
+                    document.getElementById('total-products').textContent = ADMIN_DATA.products.length;
+                    alert('Producto eliminado exitosamente');
+                }
             }
         }
 
-        async function deleteService(id) {
+        function deleteService(id) {
             if (confirm('¿Estás seguro de eliminar este servicio?')) {
-                await db.delete('services', id);
-                ui.toast('Servicio eliminado');
-                await loadServices();
-                await loadDashboard();
+                const index = ADMIN_DATA.services.findIndex(s => s.id === id);
+                if (index > -1) {
+                    ADMIN_DATA.services.splice(index, 1);
+                    loadServices();
+                    document.getElementById('total-services').textContent = ADMIN_DATA.services.length;
+                    alert('Servicio eliminado exitosamente');
+                }
             }
         }
 
-        async function deleteJob(id) {
+        function deleteJob(id) {
             if (confirm('¿Estás seguro de eliminar este empleo?')) {
-                await db.delete('jobs', id);
-                ui.toast('Empleo eliminado');
-                await loadJobs();
-                await loadDashboard();
+                const index = ADMIN_DATA.jobs.findIndex(j => j.id === id);
+                if (index > -1) {
+                    ADMIN_DATA.jobs.splice(index, 1);
+                    loadJobs();
+                    document.getElementById('total-jobs').textContent = ADMIN_DATA.jobs.length;
+                    alert('Empleo eliminado exitosamente');
+                }
             }
         }
 
         function viewOrder(id) {
-            ui.toast('Función en desarrollo', 'warning');
+            alert(`Ver detalles del pedido: ${id}\n\nEsta función mostraría los items del pedido y detalles de envío.`);
         }
 
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            auth.logout();
-        });
+        function logout() {
+            if (confirm('¿Deseas cerrar sesión?')) {
+                window.location.href = 'index.html';
+            }
+        }
     </script>
-    <style>
-        .tab-btn {
-            padding: 1rem 2rem;
-            background: transparent;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: 600;
-            color: #64748b;
-            transition: all 0.3s;
-        }
-
-        .tab-btn:hover {
-            color: #1A73E8;
-        }
-
-        .tab-btn.active {
-            color: #1A73E8;
-            border-bottom-color: #1A73E8;
-        }
-    </style>
 </body>
 
 </html>
