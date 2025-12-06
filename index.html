@@ -46,46 +46,26 @@
         <select id="cat-select" onchange="filterProducts()">
             <option value="">Todas las categorías</option>
             <option value="Postres">Postres</option>
-            <option value="Ropa">Ropa</option>
-            <option value="Artesanía">Artesanía</option>
-            <option value="Electrónicos">Electrónicos</option>
-        </select>
-        <select id="municipio-select" onchange="filterProducts()">
-            <option value="">Todos los municipios</option>
-            <option value="Santo Domingo">Santo Domingo</option>
-            <option value="Santiago">Santiago</option>
-            <option value="La Romana">La Romana</option>
-            <option value="Puerto Plata">Puerto Plata</option>
-        </select>
-    </div>
+            }
 
-    <h2 id="productos" style="margin-bottom: 1.5rem; color: #0f172a;">Productos Destacados</h2>
-    <div id="product-grid" class="product-grid"></div>
-    </div>
-    </main>
-    <footer style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
-        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
-        opacity: 0;
-        }
+            to {
+            transform: translateX(0);
+            opacity: 1;
+            }
+            }
 
-        to {
-        transform: translateX(0);
-        opacity: 1;
-        }
-        }
+            @keyframes slideOut {
+            from {
+            transform: translateX(0);
+            opacity: 1;
+            }
 
-        @keyframes slideOut {
-        from {
-        transform: translateX(0);
-        opacity: 1;
-        }
-
-        to {
-        transform: translateX(400px);
-        opacity: 0;
-        }
-        }
-        </style>
-        </body>
+            to {
+            transform: translateX(400px);
+            opacity: 0;
+            }
+            }
+            </style>
+            </body>
 
 </html>
