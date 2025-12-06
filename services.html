@@ -11,10 +11,11 @@
 <body>
     <header>
         <nav>
-            <h1><a href="index.html">🇩🇴 Marketplace RD</a></h1>
+            <h1><a href="index.html">🇩🇴 ServiMarket RD</a></h1>
             <ul>
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="services.html">Servicios</a></li>
+                <li><a href="jobs.html">Empleos</a></li>
                 <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
             </ul>
         </nav>
@@ -29,15 +30,15 @@
 
             <!-- Buscador -->
             <div class="search-bar">
-                <input type="text" id="search-input" placeholder="¿Qué servicio necesitas?">
-                <select id="cat-select">
+                <input type="text" id="search-input" placeholder="¿Qué servicio necesitas?" onkeyup="filterServices()">
+                <select id="cat-select" onchange="filterServices()">
                     <option value="">Todas las categorías</option>
                     <option value="Plomería">Plomería</option>
                     <option value="Electricidad">Electricidad</option>
                     <option value="Belleza">Belleza</option>
                     <option value="Limpieza">Limpieza</option>
+                    <option value="Técnico">Técnico</option>
                 </select>
-                <button class="btn" onclick="filterServices()">Buscar</button>
             </div>
 
             <div id="services-grid" class="product-grid">
@@ -45,67 +46,147 @@
             </div>
         </div>
 
-    </main>    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/supabase-config.js"></script>
+    </main>
 
-    <script src="assets/js/app.js"></script>
+    <footer style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
+        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
+    </footer>
+
     <script>
+        // --- LÓGICA STANDALONE PARA SERVICIOS ---
+
+        // 1. Datos de Ejemplo (Hardcoded)
+        const SERVICES = [
+            {
+                id: 1,
+                name: 'Plomería Residencial Express',
+                category: 'Plomería',
+                description: 'Reparación de fugas, instalación de grifos y destape de tuberías. Servicio 24/7.',
+                price: 1500,
+                provider: 'Juan Pérez',
+                location: 'Santo Domingo',
+                rating: 4.8,
+                image: 'assets/images/plomero.png'
+            },
+            {
+                id: 2,
+                name: 'Instalación de Inversores',
+                category: 'Electricidad',
+                description: 'Instalación y mantenimiento de inversores y baterías. Garantía de 6 meses.',
+                price: 2500,
+                provider: 'ElectroServicios RD',
+                location: 'Santiago',
+                rating: 4.9,
+                image: 'assets/images/electricista.png'
+            },
+            {
+                id: 3,
+                name: 'Maquillaje Profesional a Domicilio',
+                category: 'Belleza',
+                description: 'Maquillaje para bodas, eventos y fiestas. Productos de alta gama.',
+                price: 2000,
+                provider: 'Laura Beauty',
+                location: 'Santo Domingo',
+                rating: 5.0,
+                image: 'assets/images/maquillaje.png'
+            },
+            {
+                id: 4,
+                name: 'Limpieza Profunda de Hogar',
+                category: 'Limpieza',
+                description: 'Limpieza general, lavado de baños y cocina. Personal de confianza.',
+                price: 1200,
+                provider: 'CleanHome RD',
+                location: 'La Romana',
+                rating: 4.6,
+                image: 'assets/images/limpieza.png'
+            },
+            {
+                id: 5,
+                name: 'Reparación de Aires Acondicionados',
+                category: 'Técnico',
+                description: 'Mantenimiento preventivo y correctivo de aires split y de ventana.',
+                price: 1800,
+                provider: 'FrioMax',
+                location: 'Puerto Plata',
+                rating: 4.7,
+                image: 'assets/images/aire.png'
+            }
+        ];
+
+        // 2. Utilidades UI
+        const UI = {
+            formatCurrency: (amount) => {
+                return new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }).format(amount);
+            },
+            updateCartCounter: () => {
+                try {
+                    const items = JSON.parse(localStorage.getItem('cart')) || [];
+                    const count = items.reduce((sum, item) => sum + item.quantity, 0);
+                    const badge = document.getElementById('cart-count');
+                    if (badge) badge.textContent = count > 0 ? `(${count})` : '';
+                } catch (e) { }
+            }
+        };
+
+        // 3. Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            filterServices();
+            renderServices(SERVICES);
+            UI.updateCartCounter();
         });
 
+        // 4. Funciones Principales
         function filterServices() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const cat = document.getElementById('cat-select').value;
-            const container = document.getElementById('services-grid');
 
-            const services = db.get('services');
-            const filtered = services.filter(s => {
+            const filtered = SERVICES.filter(s => {
                 const matchQuery = s.name.toLowerCase().includes(query) || s.description.toLowerCase().includes(query);
                 const matchCat = cat === '' || s.category === cat;
                 return matchQuery && matchCat;
             });
 
-            container.innerHTML = '';
-            if (filtered.length === 0) {
-                container.innerHTML = '<p>No se encontraron servicios.</p>';
+            renderServices(filtered);
+        }
+
+        function renderServices(services) {
+            const container = document.getElementById('services-grid');
+
+            if (services.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron servicios.</p>';
                 return;
             }
 
-            filtered.forEach(s => {
-                const provider = db.get('users').find(u => u.id === s.providerId);
-                container.innerHTML += `
-                    <div class="product-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: start;">
-                                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">${s.name}</h3>
-                                <span style="background: #d1fae5; color: #065f46; padding: 0.2rem 0.5rem; border-radius: 0.3rem; font-size: 0.8rem;">${s.category}</span>
-                            </div>
-                            <p style="color: #64748b; margin-bottom: 1rem;">${s.description}</p>
-                            <p><strong>Proveedor:</strong> ${provider ? provider.name : 'Desconocido'}</p>
-                            <p><strong>Ubicación:</strong> ${provider ? provider.location : 'N/A'}</p>
+            container.innerHTML = services.map(s => `
+                <div class="product-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <img src="${s.image}" alt="${s.name}" onerror="this.src='https://placehold.co/300x200/059669/FFFFFF?text=${s.category}'" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem 0.5rem 0 0;">
+                    <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <h3 style="color: #0f172a; font-size: 1.25rem; margin: 0;">${s.name}</h3>
                         </div>
-                        <div style="margin-top: 1.5rem;">
-                            <p class="product-price">${ui.formatCurrency(s.price)}</p>
-                            <button class="btn" style="width: 100%;" onclick="requestService(${s.id})">Solicitar Servicio</button>
+                        <span style="background: #d1fae5; color: #065f46; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; align-self: start; margin-bottom: 1rem;">${s.category}</span>
+                        
+                        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem; flex-grow: 1;">${s.description}</p>
+                        
+                        <div style="border-top: 1px solid #e2e8f0; padding-top: 1rem; margin-top: auto;">
+                            <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>👤 Proveedor:</strong> ${s.provider}</p>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>📍 Ubicación:</strong> ${s.location}</p>
+                            <p style="font-size: 0.9rem; margin-bottom: 1rem;"><strong>⭐ Calificación:</strong> ${s.rating}/5.0</p>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                                <span class="product-price" style="font-size: 1.2rem;">${UI.formatCurrency(s.price)}</span>
+                                <button class="btn" onclick="requestService('${s.name}')" style="background: #059669;">Solicitar</button>
+                            </div>
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `).join('');
         }
 
-        function requestService(id) {
-            const user = auth.getCurrentUser();
-            if (!user) {
-                ui.toast('Debes iniciar sesión para solicitar servicios', 'error');
-                setTimeout(() => window.location.href = 'login.html', 1500);
-                return;
-            }
-            // Simulation of request
-            const service = db.get('services').find(s => s.id === id);
-            ui.toast(`Solicitud enviada para: ${service.name}`);
-        }
+        // Función global para el botón onclick
+        window.requestService = function (serviceName) {
+            alert(`Has solicitado el servicio: ${serviceName}\n\nEl proveedor se pondrá en contacto contigo pronto.`);
+        };
     </script>
 </body>
 
