@@ -221,37 +221,22 @@
                             rating: 5.0,
                             stock: 30,
                             image_url: 'assets/images/muneca-lime.png'
-                        }
-                    ];
-
-                    let currentProducts = [];
-
-                    document.addEventListener('DOMContentLoaded', async () => {
-                        await loadProducts();
-                        updateCartCount(); // Actualizar contador del carrito al iniciar
-                    });
-
-                    async function loadProducts() {
-                        const container = document.getElementById('product-grid');
-                        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Cargando productos...</p>';
-
-                        try {
                             // Intentar cargar de Supabase
                             console.log('Intentando cargar de Supabase...');
                             const dbProducts = await db.get('products');
 
-                            if (dbProducts && dbProducts.length > 0) {
-                                console.log('Productos cargados de BD:', dbProducts.length);
-                                currentProducts = dbProducts;
-                            } else {
-                                throw new Error('BD vacía o sin respuesta');
-                            }
-                        } catch (error) {
-                            console.warn('Usando productos de respaldo:', error);
-                            currentProducts = FALLBACK_PRODUCTS;
+                            if(dbProducts && dbProducts.length > 0) {
+                            console.log('Productos cargados de BD:', dbProducts.length);
+                            currentProducts = dbProducts;
+                        } else {
+                            throw new Error('BD vacía o sin respuesta');
                         }
+                        } catch (error) {
+                        console.warn('Usando productos de respaldo:', error);
+                        currentProducts = FALLBACK_PRODUCTS;
+                    }
 
-                        filterProducts();
+                    filterProducts();
                     }
 
                     function filterProducts() {
