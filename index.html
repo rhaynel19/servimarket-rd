@@ -76,131 +76,260 @@
                     <option value="La Romana">La Romana</option>
                     <option value="Puerto Plata">Puerto Plata</option>
                 </select>
-            </div>
+                <!DOCTYPE html>
+                <html lang="es">
 
-            <h2 id="productos" style="margin-bottom: 1.5rem; color: #0f172a;">Productos Destacados</h2>
-            <div id="product-grid" class="product-grid"></div>
-        </div>
-    </main>
-    <footer style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
-        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
-        <p style="margin-top: 0.5rem;">
-            <a href="terms.html" style="color: #D4A017; margin: 0 1rem;">Términos y Condiciones</a> |
-            <a href="privacy.html" style="color: #D4A017; margin: 0 1rem;">Política de Privacidad</a>
-        </p>
-    </footer>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>ServiMarket RD - Marketplace Dominicano</title>
+                    <meta name="description" content="Marketplace dominicano de productos, servicios y empleos">
+                    <link rel="stylesheet" href="assets/css/style.css">
+                </head>
 
-    <!-- Supabase Client (Opcional, no bloqueante) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+                <body>
+                    <header>
+                        <nav>
+                            <h1><a href="index.html">🇩🇴 ServiMarket RD</a></h1>
+                            <ul>
+                                <li><a href="index.html">Inicio</a></li>
+                                <li><a href="services.html">Servicios</a></li>
+                                <li><a href="jobs.html">Empleos</a></li>
+                                <li><a href="cart.html">Carrito <span id="cart-count"></span></a></li>
+                                <li><a href="login.html">Iniciar Sesión</a></li>
+                                <li><a href="register.html">Registrarse</a></li>
+                            </ul>
+                        </nav>
+                    </header>
+                    <main>
+                        <div class="container">
+                            <div class="hero">
+                                <h1>🇩🇴 Bienvenido a ServiMarket RD</h1>
+                                <p>Tu marketplace completo: Productos, Servicios y Empleos en un solo lugar</p>
+                            </div>
 
-    <script>
-        // --- LÓGICA STANDALONE GARANTIZADA ---
-        // Esta sección contiene TODO lo necesario para que la página funcione
-        // sin depender de archivos externos que puedan fallar.
+                            <!-- Quick Access Buttons -->
+                            <div
+                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+                                <a href="#productos" class="product-card"
+                                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">🛍️</div>
+                                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Productos</h3>
+                                    <p style="color: #64748b; font-size: 0.9rem;">Compra artículos locales</p>
+                                </a>
+                                <a href="services.html" class="product-card"
+                                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔧</div>
+                                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Servicios</h3>
+                                    <p style="color: #64748b; font-size: 0.9rem;">Encuentra profesionales</p>
+                                </a>
+                                <a href="jobs.html" class="product-card"
+                                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">💼</div>
+                                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Empleos</h3>
+                                    <p style="color: #64748b; font-size: 0.9rem;">Trabaja o contrata</p>
+                                </a>
+                                <a href="dashboard.html" class="product-card"
+                                    style="padding: 2rem; text-align: center; cursor: pointer; text-decoration: none;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                                    <h3 style="color: #1A73E8; margin-bottom: 0.5rem;">Mi Negocio</h3>
+                                    <p style="color: #64748b; font-size: 0.9rem;">Gestiona tu tienda</p>
+                                </a>
+                            </div>
 
-        // 1. Definición de Productos
-        const PRODUCTS = [
-            {
-                id: '1',
-                name: 'Dulce de Leche Artesanal',
-                price: 150,
-                category: 'Postres',
-                description: 'Hecho con leche fresca dominicana',
-                municipio: 'Santo Domingo',
-                barrio: 'Piantini',
-                rating: 4.7,
-                stock: 50,
-                image_url: 'assets/images/dulce-leche.png'
-            },
-            {
-                id: '2',
-                name: 'Guayabera Premium',
-                price: 2500,
-                category: 'Ropa',
-                description: 'Lino 100% blanco',
-                municipio: 'Santo Domingo',
-                barrio: 'Piantini',
-                rating: 4.5,
-                stock: 15,
-                image_url: 'assets/images/guayabera.png'
-            },
-            {
-                id: '3',
-                name: 'Muñeca Limé',
-                price: 800,
-                category: 'Artesanía',
-                description: 'Artesanía típica dominicana',
-                municipio: 'Santo Domingo',
-                barrio: 'Piantini',
-                rating: 5.0,
-                stock: 30,
-                image_url: 'assets/images/muneca-lime.png'
-            }
-        ];
+                            <!-- Search Bar -->
+                            <div class="search-bar">
+                                <input type="text" id="search-input" placeholder="Buscar productos..."
+                                    onkeyup="filterProducts()">
+                                <select id="cat-select" onchange="filterProducts()">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="Postres">Postres</option>
+                                    <option value="Ropa">Ropa</option>
+                                    <option value="Artesanía">Artesanía</option>
+                                    <option value="Electrónicos">Electrónicos</option>
+                                </select>
+                                <select id="municipio-select" onchange="filterProducts()">
+                                    <option value="">Todos los municipios</option>
+                                    <option value="Santo Domingo">Santo Domingo</option>
+                                    <option value="Santiago">Santiago</option>
+                                    <option value="La Romana">La Romana</option>
+                                    <option value="Puerto Plata">Puerto Plata</option>
+                                </select>
+                            </div>
 
-        // 2. Sistema de Carrito Local (Robustez total)
-        const LocalCart = {
-            get: () => {
-                try {
-                    return JSON.parse(localStorage.getItem('cart')) || [];
-                } catch (e) {
-                    return [];
-                }
-            },
-            add: (product) => {
-                let items = LocalCart.get();
-                const existing = items.find(i => i.id === product.id);
-                if (existing) {
-                    existing.quantity++;
-                } else {
-                    items.push({ ...product, quantity: 1 });
-                }
-                localStorage.setItem('cart', JSON.stringify(items));
-                LocalCart.updateCounter();
-                alert(`¡${product.name} añadido al carrito!`);
-            },
-            updateCounter: () => {
-                const items = LocalCart.get();
-                const count = items.reduce((sum, item) => sum + item.quantity, 0);
-                const badge = document.getElementById('cart-count');
-                if (badge) {
-                    badge.textContent = count > 0 ? `(${count})` : '';
-                }
-            }
-        };
+                            <h2 id="productos" style="margin-bottom: 1.5rem; color: #0f172a;">Productos Destacados</h2>
+                            <div id="product-grid" class="product-grid"></div>
+                        </div>
+                    </main>
+                    <footer
+                        style="text-align: center; padding: 2rem; background: #0f172a; color: #fff; margin-top: 2rem;">
+                        <p>&copy; 2025 ServiMarket RD. Todos los derechos reservados.</p>
+                        <p style="margin-top: 0.5rem;">
+                            <a href="terms.html" style="color: #D4A017; margin: 0 1rem;">Términos y Condiciones</a> |
+                            <a href="privacy.html" style="color: #D4A017; margin: 0 1rem;">Política de Privacidad</a>
+                        </p>
+                    </footer>
 
-        // 3. Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Iniciando ServiMarket RD (Modo Seguro)');
-            renderProducts(PRODUCTS);
-            LocalCart.updateCounter();
-        });
+                    <!-- Toast Container -->
+                    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
-        // 4. Funciones de Renderizado
-        function filterProducts() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const category = document.getElementById('cat-select').value;
-            const municipio = document.getElementById('municipio-select').value;
+                    <!-- Supabase Client (Opcional, no bloqueante) -->
+                    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-            const filtered = PRODUCTS.filter(p => {
-                const matchSearch = p.name.toLowerCase().includes(search) || p.description.toLowerCase().includes(search);
-                const matchCategory = !category || p.category === category;
-                const matchMunicipio = !municipio || p.municipio === municipio;
-                return matchSearch && matchCategory && matchMunicipio;
-            });
+                    <script>
+                        // --- LÓGICA STANDALONE GARANTIZADA ---
+                        // Esta sección contiene TODO lo necesario para que la página funcione
+                        // sin depender de archivos externos que puedan fallar.
 
-            renderProducts(filtered);
-        }
+                        // 1. Definición de Productos
+                        const PRODUCTS = [
+                            {
+                                id: '1',
+                                name: 'Dulce de Leche Artesanal',
+                                price: 150,
+                                category: 'Postres',
+                                description: 'Hecho con leche fresca dominicana',
+                                municipio: 'Santo Domingo',
+                                barrio: 'Piantini',
+                                rating: 4.7,
+                                stock: 50,
+                                image_url: 'assets/images/dulce-leche.png'
+                            },
+                            {
+                                id: '2',
+                                name: 'Guayabera Premium',
+                                price: 2500,
+                                category: 'Ropa',
+                                description: 'Lino 100% blanco',
+                                municipio: 'Santo Domingo',
+                                barrio: 'Piantini',
+                                rating: 4.5,
+                                stock: 15,
+                                image_url: 'assets/images/guayabera.png'
+                            },
+                            {
+                                id: '3',
+                                name: 'Muñeca Limé',
+                                price: 800,
+                                category: 'Artesanía',
+                                description: 'Artesanía típica dominicana',
+                                municipio: 'Santo Domingo',
+                                barrio: 'Piantini',
+                                rating: 5.0,
+                                stock: 30,
+                                image_url: 'assets/images/muneca-lime.png'
+                            }
+                        ];
 
-        function renderProducts(products) {
-            const container = document.getElementById('product-grid');
+                        // 2. Sistema de Notificaciones Toast
+                        function showToast(message, type = 'success') {
+                            const container = document.getElementById('toast-container');
+                            const toast = document.createElement('div');
 
-            if (!products || products.length === 0) {
-                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron productos.</p>';
-                return;
-            }
+                            const icons = {
+                                success: '✓',
+                                error: '✗',
+                                info: 'ℹ'
+                            };
 
-            container.innerHTML = products.map(p => `
+                            const colors = {
+                                success: 'linear-gradient(135deg, #10b981, #059669)',
+                                error: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                                info: 'linear-gradient(135deg, #3b82f6, #2563eb)'
+                            };
+
+                            toast.style.cssText = `
+                background: ${colors[type] || colors.success};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.75rem;
+                margin-bottom: 1rem;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                min-width: 300px;
+                animation: slideIn 0.3s ease-out;
+                font-weight: 500;
+            `;
+
+                            toast.innerHTML = `
+                <span style="font-size: 1.5rem; font-weight: bold;">${icons[type] || icons.success}</span>
+                <span>${message}</span>
+            `;
+
+                            container.appendChild(toast);
+
+                            setTimeout(() => {
+                                toast.style.animation = 'slideOut 0.3s ease-in';
+                                setTimeout(() => toast.remove(), 300);
+                            }, 3000);
+                        }
+
+                        // 3. Sistema de Carrito Local (Robustez total)
+                        const LocalCart = {
+                            get: () => {
+                                try {
+                                    return JSON.parse(localStorage.getItem('cart')) || [];
+                                } catch (e) {
+                                    return [];
+                                }
+                            },
+                            add: (product) => {
+                                let items = LocalCart.get();
+                                const existing = items.find(i => i.id === product.id);
+                                if (existing) {
+                                    existing.quantity++;
+                                    showToast(`${product.name} (x${existing.quantity}) en el carrito`, 'success');
+                                } else {
+                                    items.push({ ...product, quantity: 1 });
+                                    showToast(`¡${product.name} añadido al carrito!`, 'success');
+                                }
+                                localStorage.setItem('cart', JSON.stringify(items));
+                                LocalCart.updateCounter();
+                            },
+                            updateCounter: () => {
+                                const items = LocalCart.get();
+                                const count = items.reduce((sum, item) => sum + item.quantity, 0);
+                                const badge = document.getElementById('cart-count');
+                                if (badge) {
+                                    badge.textContent = count > 0 ? `(${count})` : '';
+                                }
+                            }
+                        };
+
+                        // 4. Inicialización
+                        document.addEventListener('DOMContentLoaded', () => {
+                            console.log('🚀 Iniciando ServiMarket RD (Modo Seguro)');
+                            renderProducts(PRODUCTS);
+                            LocalCart.updateCounter();
+                        });
+
+                        // 5. Funciones de Renderizado
+                        function filterProducts() {
+                            const search = document.getElementById('search-input').value.toLowerCase();
+                            const category = document.getElementById('cat-select').value;
+                            const municipio = document.getElementById('municipio-select').value;
+
+                            const filtered = PRODUCTS.filter(p => {
+                                const matchSearch = p.name.toLowerCase().includes(search) || p.description.toLowerCase().includes(search);
+                                const matchCategory = !category || p.category === category;
+                                const matchMunicipio = !municipio || p.municipio === municipio;
+                                return matchSearch && matchCategory && matchMunicipio;
+                            });
+
+                            renderProducts(filtered);
+                        }
+
+                        function renderProducts(products) {
+                            const container = document.getElementById('product-grid');
+
+                            if (!products || products.length === 0) {
+                                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron productos.</p>';
+                                return;
+                            }
+
+                            container.innerHTML = products.map(p => `
                 <div class="product-card">
                     <img src="${p.image_url}" alt="${p.name}" onerror="this.src='https://placehold.co/300x220/1A73E8/FFFFFF?text=Producto'">
                     <div class="product-info">
@@ -215,16 +344,42 @@
                     </div>
                 </div>
             `).join('');
-        }
+                        }
 
-        // Función global para el botón onclick
-        window.addToCart = function (productId) {
-            const product = PRODUCTS.find(p => p.id === productId);
-            if (product) {
-                LocalCart.add(product);
-            }
-        };
-    </script>
-</body>
+                        // Función global para el botón onclick
+                        window.addToCart = function (productId) {
+                            const product = PRODUCTS.find(p => p.id === productId);
+                            if (product) {
+                                LocalCart.add(product);
+                            }
+                        };
+                    </script>
 
-</html>
+                    <style>
+                        @keyframes slideIn {
+                            from {
+                                transform: translateX(400px);
+                                opacity: 0;
+                            }
+
+                            to {
+                                transform: translateX(0);
+                                opacity: 1;
+                            }
+                        }
+
+                        @keyframes slideOut {
+                            from {
+                                transform: translateX(0);
+                                opacity: 1;
+                            }
+
+                            to {
+                                transform: translateX(400px);
+                                opacity: 0;
+                            }
+                        }
+                    </style>
+                </body>
+
+                </html>
